@@ -1,1 +1,151 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Trip Planner | Explore India</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">AI <span>TRIP PLANNER</span> 🇮🇳</div>
+
+    <nav>
+        <a href="#planner">Plan a Trip</a>
+        <a href="#destinations">Destinations</a>
+        <a href="#about">About</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <div class="hero-content">
+        <span class="tag">DISCOVER INDIA, YOUR WAY</span>
+
+        <h1>Every journey.<br>
+        Planned beautifully.</h1>
+
+        <p>
+            Tell us where you're going and how many days
+            you have. Get a clear day-wise sightseeing plan,
+            suggested visit order and useful travel links.
+        </p>
+
+        <a href="#planner" class="hero-btn">
+            Plan Your Trip →
+        </a>
+    </div>
+</section>
+
+<main class="container">
+
+<section class="planner" id="planner">
+
+    <h2>Plan your next adventure</h2>
+
+    <div class="form-grid">
+
+        <div>
+            <label>FROM CITY</label>
+            <input type="text" id="from"
+            placeholder="Ahmedabad" value="Ahmedabad">
+        </div>
+
+        <div>
+            <label>DESTINATION</label>
+            <input type="text" id="to"
+            placeholder="Ujjain" value="Ujjain">
+        </div>
+
+        <div>
+            <label>TRIP DURATION</label>
+            <select id="days">
+                <option>1</option>
+                <option selected>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>7</option>
+            </select>
+        </div>
+
+        <div>
+            <label>TRAVEL STYLE</label>
+            <select id="style">
+                <option>Family trip</option>
+                <option>Spiritual trip</option>
+                <option>Adventure</option>
+                <option>Budget trip</option>
+                <option>Relaxed trip</option>
+            </select>
+        </div>
+
+    </div>
+
+    <button onclick="makePlan()">
+        Create My Trip →
+    </button>
+
+</section>
+
+<section class="destinations" id="destinations">
+
+    <span class="tag">GET INSPIRED</span>
+    <h2>Popular Places in India</h2>
+
+    <div class="cards">
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=700">
+            <div class="card-content">
+                <small>MADHYA PRADESH</small>
+                <h3>Ujjain</h3>
+                <p>Temples and spiritual destinations.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?w=700">
+            <div class="card-content">
+                <small>RAJASTHAN</small>
+                <h3>Jaipur</h3>
+                <p>Historic forts and royal architecture.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=700">
+            <div class="card-content">
+                <small>MAHARASHTRA</small>
+                <h3>Mumbai</h3>
+                <p>Famous landmarks and city life.</p>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+<section class="about" id="about">
+    <span class="tag">OUR IDEA</span>
+    <h2>Less searching. More exploring.</h2>
+    <p>
+        AI Trip Planner helps travellers organise
+        destinations, plan sightseeing and explore
+        India with a smarter travel itinerary.
+    </p>
+</section>
+
+</main>
+
+<footer>
+    <h3>AI TRIP PLANNER 🇮🇳</h3>
+    <p>Explore India. Plan Smarter. Travel Better.</p>
+    <small>© 2026 AI Trip Planner</small>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
+
