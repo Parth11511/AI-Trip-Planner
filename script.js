@@ -95,11 +95,12 @@ async function makePlan() {
     // OTHER INDIAN DESTINATIONS
     try {
 
+       
         // Find destination coordinates
         const geoUrl =
             "https://geocoding-api.open-meteo.com/v1/search?name=" +
             encodeURIComponent(to) +
-            "&count=5&language=en&format=json&countryCode=IN";
+            "&count=10&language=en&format=json&countryCode=IN";
 
         const geoResponse = await fetch(geoUrl);
 
@@ -117,7 +118,22 @@ async function makePlan() {
             return;
         }
 
-        const location = geoData.results[0];
+        // Select the correct Manali in Himachal Pradesh
+        let location;
+
+        if (to.toLowerCase().includes("manali")) {
+            location = geoData.results.find(item =>
+                item.name.toLowerCase() === "manali" &&
+                (item.admin1 || "").toLowerCase().includes("himachal")
+            );
+
+            if (!location) {
+                throw new Error("Manali, Himachal Pradesh could not be verified.");
+            }
+        } else {
+            location = geoData.results[0];
+        }
+
         const lat = location.latitude;
         const lon = location.longitude;
 
