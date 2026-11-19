@@ -225,11 +225,15 @@ async function makePlan() {
 
         result.innerHTML = html;
 
-    } catch (error) {
+  
+} catch (error) {
 
-        result.innerHTML = `
-            <h2>Unable to load tourist places</h2>
-            <p>Please try again after some time. The map service may be busy.</p>
-        `;
-    }
+    console.error("Trip Planner Error:", error);
+
+    result.innerHTML = `
+        <h2>Unable to load tourist places</h2>
+        <p>Error: ${String(error.message)}</p>
+        <p>Please try again later.</p>
+    `;
 }
+
