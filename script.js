@@ -236,4 +236,5 @@ async function makePlan() {
         <p>Please try again later.</p>
     `;
 }
+}
 
