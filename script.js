@@ -149,7 +149,7 @@ async function makePlan() {
         `;
 
         const mapUrl =
-            "https://overpass-api.de/api/interpreter?data=" +
+            "https://overpass.private.coffee/api/interpreter?data=" +
             encodeURIComponent(query);
 
         const mapResponse = await fetch(mapUrl);
