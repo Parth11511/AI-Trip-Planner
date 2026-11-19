@@ -45,7 +45,7 @@ function makePlan() {
     const result = document.getElementById("trip-result");
 
     if (!result) {
-        alert("Trip result section is not ready yet.");
+        alert("Trip result section is missing!");
         return;
     }
 
@@ -63,10 +63,7 @@ function makePlan() {
             html += `<h3>Day ${day + 1}</h3>`;
 
             const start = day * placesPerDay;
-            const end = Math.min(
-                start + placesPerDay,
-                ujjainPlaces.length
-            );
+            const end = Math.min(start + placesPerDay, ujjainPlaces.length);
 
             for (let i = start; i < end; i++) {
 
