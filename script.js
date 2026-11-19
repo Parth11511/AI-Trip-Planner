@@ -160,22 +160,36 @@ async function makePlan() {
 
         const mapData = await mapResponse.json();
 
-        // Remove unnamed and duplicate places
+                // Filter unnamed, generic and duplicate places
         const seen = new Set();
+
+        const blockedNames = [
+            "temple",
+            "church",
+            "mosque",
+            "shrine",
+            "sacred trees",
+            "end trail",
+            "viewpoint",
+            "valley viewpoint",
+            "meadow viewpoint",
+            "view to waterfall"
+        ];
 
         const places = mapData.elements.filter(item => {
             const name = item.tags && item.tags.name;
 
-            if (!name) return false;
+            if (!name || name.trim().length < 4) return false;
 
-            const key = name.toLowerCase();
+            const key = name.trim().toLowerCase();
+
+            if (blockedNames.includes(key)) return false;
 
             if (seen.has(key)) return false;
 
             seen.add(key);
             return true;
         });
-
         if (places.length === 0) {
             result.innerHTML = `
                 <h2>${to}</h2>
