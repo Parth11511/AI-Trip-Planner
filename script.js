@@ -30,6 +30,7 @@ const ujjainPlaces = [
     }
 ];
 
+
 async function makePlan() {
 
     const from = document.getElementById("from").value.trim();
@@ -50,11 +51,10 @@ async function makePlan() {
     }
 
     result.style.display = "block";
-    result.innerHTML = "<h2>Finding places for your trip...</h2>";
-
+    result.innerHTML = "<h2>Finding tourist places near " + to + "...</h2>";
     result.scrollIntoView({ behavior: "smooth" });
 
-    // UJJAIN ITINERARY
+    // UJJAIN: EXISTING ITINERARY
     if (to.toLowerCase().includes("ujjain")) {
 
         let html = `
@@ -92,73 +92,130 @@ async function makePlan() {
         return;
     }
 
-    // OTHER DESTINATIONS
+    // OTHER INDIAN DESTINATIONS
     try {
 
-        const searchUrl =
-            "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=" +
-            encodeURIComponent(to + " tourist attractions India") +
-            "&format=json&origin=*&srlimit=6";
+        // Find destination coordinates
+        const geoUrl =
+            "https://geocoding-api.open-meteo.com/v1/search?name=" +
+            encodeURIComponent(to) +
+            "&count=5&language=en&format=json&countryCode=IN";
 
-        const searchResponse = await fetch(searchUrl);
-        const searchData = await searchResponse.json();
+        const geoResponse = await fetch(geoUrl);
 
-        const places = searchData.query.search;
+        if (!geoResponse.ok) {
+            throw new Error("Location search failed");
+        }
 
-        if (!places || places.length === 0) {
+        const geoData = await geoResponse.json();
+
+        if (!geoData.results || geoData.results.length === 0) {
+            result.innerHTML = `
+                <h2>Destination not found</h2>
+                <p>Please check the spelling or try another Indian city.</p>
+            `;
+            return;
+        }
+
+        const location = geoData.results[0];
+        const lat = location.latitude;
+        const lon = location.longitude;
+
+        // Search nearby tourist places using OpenStreetMap
+        const query = `
+            [out:json][timeout:25];
+            (
+                nwr(around:20000,${lat},${lon})["tourism"~"attraction|museum|zoo|theme_park|viewpoint|gallery"];
+                nwr(around:20000,${lat},${lon})["historic"];
+                nwr(around:20000,${lat},${lon})["amenity"="place_of_worship"];
+            );
+            out center 40;
+        `;
+
+        const mapUrl =
+            "https://overpass-api.de/api/interpreter?data=" +
+            encodeURIComponent(query);
+
+        const mapResponse = await fetch(mapUrl);
+
+        if (!mapResponse.ok) {
+            throw new Error("Tourist places search failed");
+        }
+
+        const mapData = await mapResponse.json();
+
+        // Remove unnamed and duplicate places
+        const seen = new Set();
+
+        const places = mapData.elements.filter(item => {
+            const name = item.tags && item.tags.name;
+
+            if (!name) return false;
+
+            const key = name.toLowerCase();
+
+            if (seen.has(key)) return false;
+
+            seen.add(key);
+            return true;
+        });
+
+        if (places.length === 0) {
             result.innerHTML = `
                 <h2>${to}</h2>
-                <p>We couldn't find information automatically.</p>
+                <p>No mapped tourist places were found nearby.</p>
                 <a target="_blank" rel="noopener"
                    href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(to + " tourist places India")}">
-                   Explore ${to} on Google Maps →
+                   Search ${to} on Google Maps →
                 </a>
             `;
             return;
         }
 
-        const pageIds = places.map(place => place.pageid).join("|");
-
-        const detailsUrl =
-            "https://en.wikipedia.org/w/api.php?action=query&pageids=" +
-            pageIds +
-            "&prop=extracts&exintro=1&explaintext=1&format=json&origin=*";
-
-        const detailsResponse = await fetch(detailsUrl);
-        const detailsData = await detailsResponse.json();
-
-        const pages = Object.values(detailsData.query.pages);
-
         let html = `
             <h2>${from} → ${to}</h2>
             <p>${days} Days | ${style}</p>
-            <h3>Places to Explore in ${to}</h3>
-            <p>Information collected from Wikipedia. Please verify details before travelling.</p>
+            <h3>Tourist Places near ${to}</h3>
+            <p>Places found within approximately 20 km of your destination. Map data may be incomplete.</p>
         `;
 
-        const placesPerDay = Math.ceil(pages.length / days);
+        const placesPerDay = Math.ceil(places.length / days);
 
         for (let day = 0; day < days; day++) {
 
-            html += `<h3>Day ${day + 1}</h3>`;
-
             const start = day * placesPerDay;
-            const end = Math.min(start + placesPerDay, pages.length);
+            const end = Math.min(start + placesPerDay, places.length);
+
+            if (start >= places.length) break;
+
+            html += `<h3>Day ${day + 1}</h3>`;
 
             for (let i = start; i < end; i++) {
 
-                const place = pages[i];
+                const place = places[i];
+                const name = place.tags.name;
 
-                const description = (place.extract || "More information is available on Wikipedia.")
-                    .substring(0, 500);
+                const category =
+                    place.tags.tourism ||
+                    place.tags.historic ||
+                    place.tags.amenity ||
+                    "Tourist place";
+
+                const safeName = String(name).replace(/[&<>"']/g, char => ({
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;"
+                })[char]);
 
                 html += `
                     <div class="trip-place">
-                        <h4>${i + 1}. ${place.title}</h4>
-                        <p>${description}</p>
+                        <h4>${i + 1}. ${safeName}</h4>
+                        <p>Category: ${category}</p>
 
                         <a target="_blank" rel="noopener"
-                           href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.title + " " + to)}">
+                           href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + to + " India")}">
                            Open in Google Maps →
                         </a>
                     </div>
@@ -171,8 +228,8 @@ async function makePlan() {
     } catch (error) {
 
         result.innerHTML = `
-            <h2>Unable to load trip details</h2>
-            <p>Please check your internet connection and try again.</p>
+            <h2>Unable to load tourist places</h2>
+            <p>Please try again after some time. The map service may be busy.</p>
         `;
     }
 }
