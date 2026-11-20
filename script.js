@@ -1,7 +1,7 @@
 
 // =========================================
 // AI TRIP PLANNER - SCRIPT.JS
-// 27 DESTINATIONS + HOTELS
+// 27 DESTINATIONS + 27 HOTEL CARDS
 // =========================================
 
 const destinations = {
@@ -116,6 +116,148 @@ const destinations = {
 };
 
 // =========================================
+// HOTEL DATA - ONE HOTEL PER DESTINATION
+// =========================================
+
+const hotelData = {
+    "ujjain": {
+        name: "Anjushree",
+        type: "Hotel",
+        description: "A hotel option for visitors exploring Ujjain."
+    },
+    "manali": {
+        name: "Johnson Lodge & Spa",
+        type: "Mountain hotel",
+        description: "A stay option in the Manali area."
+    },
+    "jaipur": {
+        name: "Dera Mandawa",
+        type: "Heritage homestay",
+        description: "A heritage-style stay in Jaipur."
+    },
+    "mumbai": {
+        name: "The Taj Mahal Palace",
+        type: "Luxury heritage hotel",
+        description: "A landmark hotel near the Gateway of India."
+    },
+    "ahmedabad": {
+        name: "House of MG",
+        type: "Heritage hotel",
+        description: "A heritage property in Ahmedabad."
+    },
+    "delhi": {
+        name: "The Imperial",
+        type: "Luxury heritage hotel",
+        description: "A well-known heritage hotel in New Delhi."
+    },
+    "agra": {
+        name: "The Oberoi Amarvilas",
+        type: "Luxury hotel",
+        description: "A hotel known for views of the Taj Mahal."
+    },
+    "goa": {
+        name: "Ahilya by the Sea",
+        type: "Boutique hotel",
+        description: "A coastal boutique stay in Goa."
+    },
+    "dwarka": {
+        name: "Lemon Tree Premier",
+        type: "Hotel",
+        description: "A hotel option for visitors to Dwarka."
+    },
+    "somnath": {
+        name: "Lords Inn Somnath",
+        type: "Hotel",
+        description: "A hotel option for Somnath visitors."
+    },
+    "chotila": {
+        name: "Chotila local accommodation",
+        type: "Local stay",
+        description: "Check locally available guesthouses and hotels before travelling."
+    },
+    "kedarnath": {
+        name: "GMVN Tourist Rest House",
+        type: "Tourist accommodation",
+        description: "Government tourism accommodation; seasonal operation and booking conditions apply."
+    },
+    "udaipur": {
+        name: "Taj Lake Palace",
+        type: "Luxury heritage hotel",
+        description: "A historic palace hotel on Lake Pichola."
+    },
+    "jaisalmer": {
+        name: "Suryagarh",
+        type: "Heritage luxury hotel",
+        description: "A heritage-style hotel in Jaisalmer."
+    },
+    "varanasi": {
+        name: "BrijRama Palace",
+        type: "Heritage hotel",
+        description: "A heritage property near the ghats of Varanasi."
+    },
+    "kerala": {
+        name: "Coconut Lagoon",
+        type: "Backwater resort",
+        description: "A backwater resort in Kumarakom, Kerala."
+    },
+    "munnar": {
+        name: "Windermere Estate",
+        type: "Tea estate stay",
+        description: "A nature-focused stay in the Munnar hills."
+    },
+    "ladakh": {
+        name: "The Grand Dragon Ladakh",
+        type: "Hotel",
+        description: "A hotel option in Leh, Ladakh."
+    },
+    "rishikesh": {
+        name: "Ananda in the Himalayas",
+        type: "Wellness resort",
+        description: "A wellness retreat near Rishikesh, in Narendra Nagar."
+    },
+    "hampi": {
+        name: "Evolve Back Kamalapura Palace",
+        type: "Heritage resort",
+        description: "A resort near the Hampi heritage area."
+    },
+    "mysuru": {
+        name: "Royal Orchid Metropole",
+        type: "Heritage hotel",
+        description: "A heritage hotel in Mysuru."
+    },
+    "madikeri": {
+        name: "Taj Madikeri Resort & Spa",
+        type: "Hill resort",
+        description: "A resort surrounded by the Coorg hills."
+    },
+    "amritsar": {
+        name: "Le Méridien Amritsar",
+        type: "Hotel",
+        description: "A hotel option in Amritsar."
+    },
+    "darjeeling": {
+        name: "Glenburn Tea Estate",
+        type: "Tea estate stay",
+        description: "A tea estate stay near Darjeeling."
+    },
+    "shimla": {
+        name: "The Oberoi Cecil",
+        type: "Heritage hotel",
+        description: "A heritage hotel in Shimla."
+    },
+    "mcleod ganj": {
+        name: "Chonor House",
+        type: "Guesthouse",
+        description: "A Tibetan-style guesthouse in McLeod Ganj."
+    },
+    "rann of kutch": {
+        name: "Rann Utsav Tent City",
+        type: "Seasonal tent accommodation",
+        description: "A seasonal tent stay near the White Rann; check festival dates."
+    }
+};
+
+// =========================================
 // DESTINATION ALIASES
 // =========================================
 
@@ -123,11 +265,13 @@ const aliases = {
     "new delhi": "delhi",
     "taj mahal": "agra",
     "coorg": "madikeri",
-    "madikeri (coorg)": "madikeri"
+    "madikeri (coorg)": "madikeri",
+    "mcleodganj": "mcleod ganj",
+    "rann of kutch": "rann of kutch"
 };
 
 // =========================================
-// HTML SAFETY
+// HTML ESCAPE
 // =========================================
 
 function escapeHTML(value) {
@@ -141,7 +285,7 @@ function escapeHTML(value) {
 }
 
 // =========================================
-// GOOGLE MAPS LINKS
+// GOOGLE MAPS PLACE LINK
 // =========================================
 
 function googleMapsLink(query) {
@@ -150,47 +294,62 @@ function googleMapsLink(query) {
 }
 
 // =========================================
-// HOTELS FOR ALL 27 DESTINATIONS
+// HOTEL SECTION - WEBSITE KE ANDAR
 // =========================================
 
-function createHotelSection(city) {
-    const hotelQuery = encodeURIComponent(
-        "Hotels in " + city + ", India"
-    );
+function createHotelSection(destinationKey) {
+    const hotel = hotelData[destinationKey];
 
-    const hotelMapLink =
-        "https://www.google.com/maps/search/?api=1&query=" +
-        hotelQuery;
+    if (!hotel) {
+        return `
+            <section class="hotel-section">
+                <h2>🏨 Hotels</h2>
+                <p>Hotel information is not available yet.</p>
+            </section>
+        `;
+    }
+
+    const city = destinations[destinationKey].city;
+    const hotelSearchLink = googleMapsLink(
+        hotel.name + " " + city + " India"
+    );
 
     return `
         <section class="hotel-section">
-            <h2>🏨 Hotels in ${escapeHTML(city)}</h2>
+            <h2>🏨 Recommended Stay in ${escapeHTML(city)}</h2>
 
-            <p>
-                Find hotels, locations, ratings and available
-                contact details for ${escapeHTML(city)}.
-            </p>
+            <div class="hotel-card">
+                <div class="hotel-card-content">
+                    <span class="hotel-label">HOTEL OPTION</span>
 
-            <div class="trip-place hotel-card">
-                <h3>Find Hotels in ${escapeHTML(city)}</h3>
+                    <h3>${escapeHTML(hotel.name)}</h3>
 
-                <p>
-                    Explore nearby hotels and compare
-                    publicly listed information.
-                </p>
+                    <p class="hotel-type">
+                        ${escapeHTML(hotel.type)}
+                    </p>
 
-                <a href="${hotelMapLink}"
-                   target="_blank"
-                   rel="noopener noreferrer">
-                    View Hotels on Google Maps →
-                </a>
+                    <p>
+                        ${escapeHTML(hotel.description)}
+                    </p>
+
+                    <p>
+                        <strong>Destination:</strong>
+                        ${escapeHTML(city)}, India
+                    </p>
+
+                    <a
+                        href="${hotelSearchLink}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Check hotel location and details →
+                    </a>
+                </div>
             </div>
 
-            <p>
-                <small>
-                    Prices, facilities and availability should
-                    be confirmed directly with each hotel.
-                </small>
+            <p class="hotel-note">
+                Confirm current prices, availability, address
+                and facilities directly before booking.
             </p>
         </section>
     `;
@@ -208,12 +367,16 @@ function createPlacesSection(destination) {
     `;
 
     destination.places.forEach((place, index) => {
-        const link = googleMapsLink(place + " " + destination.city);
+        const link = googleMapsLink(
+            place + " " + destination.city
+        );
 
         html += `
             <div class="trip-place">
                 <h3>${index + 1}. ${escapeHTML(place)}</h3>
-                <a href="${link}" target="_blank"
+
+                <a href="${link}"
+                   target="_blank"
                    rel="noopener noreferrer">
                     Open in Google Maps →
                 </a>
@@ -233,19 +396,24 @@ function createPlacesSection(destination) {
 // CREATE TRIP PLAN
 // =========================================
 
-function createSavedPlan(from, destination, days, style) {
-    const placesHTML = createPlacesSection(destination);
-    const hotelsHTML = createHotelSection(destination.city);
+function createSavedPlan(from, destinationKey, days, style) {
+    const destination = destinations[destinationKey];
 
     return `
         <div class="trip-plan">
-            <h2>✈️ ${escapeHTML(from)} → ${escapeHTML(destination.city)}</h2>
+            <h2>
+                ✈️ ${escapeHTML(from)}
+                → ${escapeHTML(destination.city)}
+            </h2>
 
-            <p><strong>${escapeHTML(days)} Days</strong> | ${escapeHTML(style)} trip</p>
+            <p>
+                <strong>${escapeHTML(days)} Days</strong>
+                | ${escapeHTML(style)} trip
+            </p>
 
-            ${placesHTML}
+            ${createPlacesSection(destination)}
 
-            ${hotelsHTML}
+            ${createHotelSection(destinationKey)}
         </div>
     `;
 }
@@ -262,7 +430,7 @@ function makePlan() {
     const result = document.getElementById("trip-result");
 
     if (!fromInput || !toInput || !daysInput || !styleInput || !result) {
-        alert("Website HTML elements nahi mile. IDs check karo.");
+        alert("Website HTML IDs check karo.");
         return;
     }
 
@@ -272,46 +440,65 @@ function makePlan() {
     const style = styleInput.value;
 
     if (!from || !to) {
-        alert("Please enter starting city and destination.");
+        alert("Starting city aur destination enter karo.");
         return;
     }
 
     if (!days || Number(days) < 1) {
-        alert("Please enter valid trip days.");
+        alert("Valid trip days enter karo.");
         return;
     }
 
     const normalized = to.toLowerCase().trim();
-    const key = aliases[normalized] || normalized;
-    const destination = destinations[key];
+    const destinationKey = aliases[normalized] || normalized;
 
     result.innerHTML = "";
 
-    if (destination) {
+    if (destinations[destinationKey]) {
         result.innerHTML = createSavedPlan(
             from,
-            destination,
+            destinationKey,
             days,
             style
         );
         return;
     }
 
-    const placesLink = googleMapsLink("Tourist places in " + to);
-    const hotelsLink = googleMapsLink("Hotels in " + to + ", India");
+    const placesLink = googleMapsLink(
+        "Tourist places in " + to
+    );
+
+    const hotelsLink = googleMapsLink(
+        "Hotels in " + to + ", India"
+    );
 
     result.innerHTML = `
         <div class="trip-plan">
-            <h2>✈️ ${escapeHTML(from)} → ${escapeHTML(to)}</h2>
-            <p>${escapeHTML(days)} Days | ${escapeHTML(style)} trip</p>
+            <h2>
+                ✈️ ${escapeHTML(from)}
+                → ${escapeHTML(to)}
+            </h2>
+
+            <p>
+                ${escapeHTML(days)} Days |
+                ${escapeHTML(style)} trip
+            </p>
 
             <h2>📍 Tourist Places</h2>
+
             <a href="${placesLink}" target="_blank"
                rel="noopener noreferrer">
-                Find Tourist Places on Google Maps →
+                Find Tourist Places →
             </a>
 
-            ${createHotelSection(to)}
+            <section class="hotel-section">
+                <h2>🏨 Hotels in ${escapeHTML(to)}</h2>
+
+                <a href="${hotelsLink}" target="_blank"
+                   rel="noopener noreferrer">
+                    Find Hotels →
+                </a>
+            </section>
         </div>
     `;
 }
