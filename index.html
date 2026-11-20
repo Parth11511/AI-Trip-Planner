@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="Plan your India trip with AI Trip Planner. Discover tourist places and create day-wise itineraries.">
     <title>AI Trip Planner | Explore India</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -47,31 +49,31 @@
     <div class="form-grid">
 
         <div>
-            <label>FROM CITY</label>
+            <label for="from">FROM CITY</label>
             <input type="text" id="from"
             placeholder="Ahmedabad" value="Ahmedabad">
         </div>
 
         <div>
-            <label>DESTINATION</label>
+            <label for="to">DESTINATION</label>
             <input type="text" id="to"
-            placeholder="Ujjain" value="Ujjain">
+            placeholder="Manali" value="Manali">
         </div>
 
         <div>
-            <label>TRIP DURATION</label>
+            <label for="days">TRIP DURATION</label>
             <select id="days">
-                <option>1</option>
-                <option selected>2</option>
-                <option>3</option>
-                <option>4</option>
-                <option>5</option>
-                <option>7</option>
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="7">7</option>
             </select>
         </div>
 
         <div>
-            <label>TRAVEL STYLE</label>
+            <label for="style">TRAVEL STYLE</label>
             <select id="style">
                 <option>Family trip</option>
                 <option>Spiritual trip</option>
@@ -83,14 +85,17 @@
 
     </div>
 
-    <button onclick="makePlan()">
+    <button type="button" id="create-trip-btn" onclick="makePlan()">
         Create My Trip →
     </button>
 
 </section>
+
 <section id="trip-result" class="trip-result"
-style="display:none; background:white; padding:25px; margin-top:25px; border-radius:15px;">
+style="display:none; background:white; padding:25px; margin-top:25px; border-radius:15px;"
+aria-live="polite">
 </section>
+
 <section class="destinations" id="destinations">
 
     <span class="tag">GET INSPIRED</span>
@@ -99,7 +104,7 @@ style="display:none; background:white; padding:25px; margin-top:25px; border-rad
     <div class="cards">
 
         <div class="card">
-            <img src="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=700">
+            <img src="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=700" alt="Ujjain">
             <div class="card-content">
                 <small>MADHYA PRADESH</small>
                 <h3>Ujjain</h3>
@@ -108,7 +113,7 @@ style="display:none; background:white; padding:25px; margin-top:25px; border-rad
         </div>
 
         <div class="card">
-            <img src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?w=700">
+            <img src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?w=700" alt="Jaipur">
             <div class="card-content">
                 <small>RAJASTHAN</small>
                 <h3>Jaipur</h3>
@@ -117,7 +122,7 @@ style="display:none; background:white; padding:25px; margin-top:25px; border-rad
         </div>
 
         <div class="card">
-            <img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=700">
+            <img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=700" alt="Mumbai">
             <div class="card-content">
                 <small>MAHARASHTRA</small>
                 <h3>Mumbai</h3>
@@ -148,6 +153,6 @@ style="display:none; background:white; padding:25px; margin-top:25px; border-rad
 </footer>
 
 <script src="script.js"></script>
+
 </body>
 </html>
-
