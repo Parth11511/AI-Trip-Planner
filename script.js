@@ -1,8 +1,10 @@
 
-// ==========================================
-// AI TRIP PLANNER - OPTIMIZED VERSION
-// Parallel Search + 24 Hour Cache
-// ==========================================
+/* =========================================
+   AI TRIP PLANNER
+   FAST SEARCH + SMART CACHE VERSION
+========================================= */
+
+// UJJAIN SPECIAL PLACES
 
 const ujjainPlaces = [
     {
@@ -35,21 +37,26 @@ const ujjainPlaces = [
     }
 ];
 
-// ==========================================
+// =========================================
 // CACHE SETTINGS
-// ==========================================
+// =========================================
 
-const CACHE_TIME = 24 * 60 * 60 * 1000;
-const GEO_CACHE_TIME = 7 * 24 * 60 * 60 * 1000;
+const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
 
-const CACHE_PREFIX = "aiTripPlanner_";
-const pendingSearches = new Map();
+const CACHE_PREFIX = "AITRIP_FAST_V5_";
 
-// ==========================================
-// HELPER FUNCTIONS
-// ==========================================
+const memoryCache = new Map();
+
+const activeRequests = new Map();
+
+let isSearching = false;
+
+// =========================================
+// SAFE HTML
+// =========================================
 
 function escapeHTML(value) {
+
     return String(value).replace(/[&<>"']/g, char => ({
         "&": "&amp;",
         "<": "&lt;",
@@ -57,54 +64,88 @@ function escapeHTML(value) {
         '"': "&quot;",
         "'": "&#39;"
     })[char]);
+
 }
 
-function readCache(key, duration) {
+// =========================================
+// CACHE FUNCTIONS
+// =========================================
+
+function getCache(key) {
+
+    // Check memory first
+    const memoryData = memoryCache.get(key);
+
+    if (memoryData && Date.now() - memoryData.time < CACHE_DURATION) {
+        console.log("Memory cache HIT:", key);
+        return memoryData.value;
+    }
+
+    // Check browser storage
     try {
+
         const saved = localStorage.getItem(CACHE_PREFIX + key);
 
         if (!saved) return null;
 
         const data = JSON.parse(saved);
 
-        if (Date.now() - data.time > duration) {
+        if (Date.now() - data.time > CACHE_DURATION) {
+
             localStorage.removeItem(CACHE_PREFIX + key);
+
             return null;
         }
+
+        memoryCache.set(key, data);
+
+        console.log("LocalStorage cache HIT:", key);
 
         return data.value;
 
     } catch (error) {
+
+        console.warn("Cache read error:", error);
+
         return null;
     }
 }
 
-function saveCache(key, value) {
+function setCache(key, value) {
+
+    const data = {
+        time: Date.now(),
+        value: value
+    };
+
+    // Save in memory
+    memoryCache.set(key, data);
+
+    // Save in browser storage
     try {
+
         localStorage.setItem(
             CACHE_PREFIX + key,
-            JSON.stringify({
-                time: Date.now(),
-                value: value
-            })
+            JSON.stringify(data)
         );
+
     } catch (error) {
+
         console.warn("Cache storage unavailable:", error);
     }
 }
 
-// ==========================================
+// =========================================
 // FETCH WITH TIMEOUT
-// ==========================================
+// =========================================
 
-async function fetchJSON(url, timeout = 15000) {
+async function fetchJSON(url, timeout = 12000) {
 
     const controller = new AbortController();
 
-    const timer = setTimeout(
-        () => controller.abort(),
-        timeout
-    );
+    const timer = setTimeout(() => {
+        controller.abort();
+    }, timeout);
 
     try {
 
@@ -113,44 +154,49 @@ async function fetchJSON(url, timeout = 15000) {
         });
 
         if (!response.ok) {
-            throw new Error("API request failed: " + response.status);
+            throw new Error("API Error: " + response.status);
         }
 
         return await response.json();
 
     } finally {
+
         clearTimeout(timer);
+
     }
 }
 
-// ==========================================
-// GEOGRAPHIC LOCATION SEARCH
-// ==========================================
+// =========================================
+// DESTINATION SEARCH
+// =========================================
 
 async function findLocation(city) {
 
-    const cacheKey = "geo_" + city.toLowerCase();
+    const cacheKey = "location_" + city.toLowerCase();
 
-    const cached = readCache(cacheKey, GEO_CACHE_TIME);
+    const cached = getCache(cacheKey);
 
     if (cached) {
-        console.log("Location loaded from cache");
         return cached;
     }
 
-    const geoUrl =
+    const url =
         "https://geocoding-api.open-meteo.com/v1/search?name=" +
         encodeURIComponent(city) +
         "&count=10&language=en&format=json&countryCode=IN";
 
-    const data = await fetchJSON(geoUrl);
+    const data = await fetchJSON(url);
 
     if (!data.results || data.results.length === 0) {
-        throw new Error("Destination not found. Please check spelling.");
+
+        throw new Error(
+            "Destination not found. Please check spelling."
+        );
     }
 
     let location;
 
+    // Select Manali in Himachal Pradesh
     if (city.toLowerCase().includes("manali")) {
 
         location = data.results.find(item =>
@@ -159,117 +205,183 @@ async function findLocation(city) {
         );
 
         if (!location) {
-            throw new Error("Manali, Himachal Pradesh could not be verified.");
+            throw new Error("Manali, Himachal Pradesh not found.");
         }
 
     } else {
+
         location = data.results[0];
+
     }
 
-    saveCache(cacheKey, location);
+    setCache(cacheKey, location);
 
     return location;
 }
 
-// ==========================================
-// PARALLEL OVERPASS SEARCH
-// ==========================================
+// =========================================
+// OVERPASS API SEARCH
+// =========================================
 
-async function searchOverpass(lat, lon) {
+async function fetchOverpass(server, query, timeout = 10000) {
 
-    const cacheKey =
-        "places_" + lat.toFixed(3) + "_" + lon.toFixed(3);
+    const controller = new AbortController();
 
-    const cached = readCache(cacheKey, CACHE_TIME);
-
-    if (cached) {
-        console.log("Tourist places loaded from cache");
-        return cached;
-    }
-
-    const query = `
-        [out:json][timeout:18];
-        (
-            nwr(around:20000,${lat},${lon})
-            ["tourism"~"attraction|museum|zoo|theme_park|viewpoint|gallery"];
-
-            nwr(around:20000,${lat},${lon})
-            ["historic"];
-
-            nwr(around:20000,${lat},${lon})
-            ["amenity"="place_of_worship"];
-        );
-        out center 40;
-    `;
-
-    // Multiple servers are tried simultaneously.
-    const servers = [
-        "https://overpass.private.coffee/api/interpreter",
-        "https://overpass-api.de/api/interpreter",
-        "https://overpass.kumi.systems/api/interpreter"
-    ];
-
-    const controllers = [];
-    const timers = [];
+    const timer = setTimeout(() => {
+        controller.abort();
+    }, timeout);
 
     try {
 
-        const requests = servers.map(async server => {
+        const response = await fetch(server, {
 
-            const controller = new AbortController();
-            controllers.push(controller);
+            method: "POST",
 
-            const timer = setTimeout(
-                () => controller.abort(),
-                20000
-            );
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
 
-            timers.push(timer);
+            body: "data=" + encodeURIComponent(query),
 
-            const response = await fetch(server, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: "data=" + encodeURIComponent(query),
-                signal: controller.signal
-            });
-
-            if (!response.ok) {
-                throw new Error("Overpass server unavailable");
-            }
-
-            const data = await response.json();
-
-            if (!data.elements) {
-                throw new Error("Invalid tourist places response");
-            }
-
-            return data;
+            signal: controller.signal
 
         });
 
-        // First successful server response wins.
-        const data = await Promise.any(requests);
+        if (!response.ok) {
 
-        // Stop other requests after success.
-        controllers.forEach(controller => controller.abort());
+            throw new Error("Server error: " + response.status);
 
-        saveCache(cacheKey, data);
+        }
+
+        const data = await response.json();
+
+        if (!data.elements || data.remark) {
+
+            throw new Error("Invalid tourist places response.");
+
+        }
 
         return data;
 
     } finally {
 
-        timers.forEach(timer => clearTimeout(timer));
-        controllers.forEach(controller => controller.abort());
+        clearTimeout(timer);
 
     }
 }
 
-// ==========================================
-// FILTER AND SORT TOURIST PLACES
-// ==========================================
+// =========================================
+// FAST TOURIST PLACES SEARCH
+// =========================================
+
+async function searchOverpass(lat, lon, city) {
+
+    const cacheKey = "tourist_places_" + city.toLowerCase();
+
+    // Cache check before API request
+    const cached = getCache(cacheKey);
+
+    if (cached) {
+
+        console.log("Tourist places loaded instantly from cache!");
+
+        return cached;
+
+    }
+
+    // Prevent duplicate simultaneous requests
+    if (activeRequests.has(cacheKey)) {
+
+        return activeRequests.get(cacheKey);
+
+    }
+
+    const searchPromise = (async () => {
+
+        const query = `
+            [out:json][timeout:10];
+
+            (
+                nwr(around:10000,${lat},${lon})
+                ["tourism"="attraction"];
+
+                nwr(around:10000,${lat},${lon})
+                ["tourism"="museum"];
+
+                nwr(around:10000,${lat},${lon})
+                ["tourism"="viewpoint"];
+
+                nwr(around:10000,${lat},${lon})
+                ["historic"];
+
+                nwr(around:10000,${lat},${lon})
+                ["amenity"="place_of_worship"];
+            );
+
+            out center 25;
+        `;
+
+        // Primary server
+        const servers = [
+            "https://overpass-api.de/api/interpreter",
+            "https://overpass.kumi.systems/api/interpreter"
+        ];
+
+        let lastError;
+
+        for (const server of servers) {
+
+            try {
+
+                console.log("Searching with:", server);
+
+                const data = await fetchOverpass(
+                    server,
+                    query,
+                    10000
+                );
+
+                setCache(cacheKey, data);
+
+                console.log(
+                    "Tourist places found:",
+                    data.elements.length
+                );
+
+                return data;
+
+            } catch (error) {
+
+                lastError = error;
+
+                console.warn(
+                    "Server failed. Trying backup server:",
+                    error.message
+                );
+
+            }
+        }
+
+        throw lastError || new Error("All tourist servers failed.");
+
+    })();
+
+    activeRequests.set(cacheKey, searchPromise);
+
+    try {
+
+        return await searchPromise;
+
+    } finally {
+
+        activeRequests.delete(cacheKey);
+
+    }
+}
+
+// =========================================
+// FILTER TOURIST PLACES
+// =========================================
 
 function filterPlaces(elements) {
 
@@ -309,49 +421,54 @@ function filterPlaces(elements) {
         seen.add(key);
 
         return true;
+
     });
 
-    // Give attractions and museums priority.
+    // Important attractions first
     places.sort((a, b) => {
 
         function priority(item) {
 
-            const tourism = item.tags.tourism;
+            if (item.tags.tourism === "attraction") return 1;
 
-            if (tourism === "attraction") return 1;
-            if (tourism === "museum") return 2;
+            if (item.tags.tourism === "museum") return 2;
+
             if (item.tags.historic) return 3;
+
             if (item.tags.amenity === "place_of_worship") return 4;
 
             return 5;
         }
 
         return priority(a) - priority(b);
+
     });
 
     return places;
 }
 
-// ==========================================
-// GOOGLE MAPS LINK
-// ==========================================
+// =========================================
+// GOOGLE MAPS LINKS
+// =========================================
 
 function createMapLink(name, city) {
 
     const query = encodeURIComponent(name + " " + city + " India");
 
     return `
-        <a target="_blank"
-           rel="noopener noreferrer"
-           href="https://www.google.com/maps/search/?api=1&query=${query}">
-           Open in Google Maps →
+        <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://www.google.com/maps/search/?api=1&query=${query}"
+        >
+            Open in Google Maps →
         </a>
     `;
 }
 
-// ==========================================
-// DAY-WISE ITINERARY
-// ==========================================
+// =========================================
+// DAY WISE ITINERARY
+// =========================================
 
 function createItinerary(places, days, city) {
 
@@ -362,7 +479,11 @@ function createItinerary(places, days, city) {
     for (let day = 0; day < days; day++) {
 
         const start = day * placesPerDay;
-        const end = Math.min(start + placesPerDay, places.length);
+
+        const end = Math.min(
+            start + placesPerDay,
+            places.length
+        );
 
         if (start >= places.length) break;
 
@@ -381,6 +502,7 @@ function createItinerary(places, days, city) {
                 "Tourist place";
 
             html += `
+
                 <div class="trip-place">
 
                     <h4>${i + 1}. ${escapeHTML(name)}</h4>
@@ -390,6 +512,7 @@ function createItinerary(places, days, city) {
                     ${createMapLink(name, city)}
 
                 </div>
+
             `;
         }
     }
@@ -397,24 +520,32 @@ function createItinerary(places, days, city) {
     return html;
 }
 
-// ==========================================
-// UJJAIN SPECIAL ITINERARY
-// ==========================================
+// =========================================
+// UJJAIN ITINERARY
+// =========================================
 
 function createUjjainPlan(from, to, days, style) {
 
     let html = `
+
         <h2>${escapeHTML(from)} → ${escapeHTML(to)}</h2>
+
         <p>${days} Days | ${escapeHTML(style)}</p>
+
         <h3>Tourist Places near Ujjain</h3>
+
     `;
 
-    const placesPerDay = Math.ceil(ujjainPlaces.length / days);
+    const perDay = Math.ceil(ujjainPlaces.length / days);
 
     for (let day = 0; day < days; day++) {
 
-        const start = day * placesPerDay;
-        const end = Math.min(start + placesPerDay, ujjainPlaces.length);
+        const start = day * perDay;
+
+        const end = Math.min(
+            start + perDay,
+            ujjainPlaces.length
+        );
 
         if (start >= ujjainPlaces.length) break;
 
@@ -425,11 +556,17 @@ function createUjjainPlan(from, to, days, style) {
             const place = ujjainPlaces[i];
 
             html += `
+
                 <div class="trip-place">
+
                     <h4>${i + 1}. ${escapeHTML(place.name)}</h4>
+
                     <p>${escapeHTML(place.description)}</p>
+
                     ${createMapLink(place.name, "Ujjain")}
+
                 </div>
+
             `;
         }
     }
@@ -437,13 +574,16 @@ function createUjjainPlan(from, to, days, style) {
     return html;
 }
 
-// ==========================================
+// =========================================
 // MAIN TRIP PLANNER
-// ==========================================
+// =========================================
 
 async function makePlan() {
 
+    if (isSearching) return;
+
     const from = document.getElementById("from").value.trim();
+
     const to = document.getElementById("to").value.trim();
 
     const days = Math.max(
@@ -458,67 +598,95 @@ async function makePlan() {
     const button = document.getElementById("create-trip-btn");
 
     if (!from || !to) {
+
         alert("Please enter starting city and destination!");
+
         return;
     }
 
     if (!result) {
+
         alert("Trip result section is missing!");
+
         return;
     }
 
+    isSearching = true;
+
     result.style.display = "block";
 
+    result.setAttribute("aria-busy", "true");
+
     result.innerHTML = `
+
         <h2>Finding tourist places near ${escapeHTML(to)}...</h2>
-        <p>Please wait while we prepare your trip.</p>
+
+        <p>Preparing your trip. Please wait...</p>
+
     `;
 
     if (button) {
+
         button.disabled = true;
+
         button.textContent = "Searching...";
+
     }
 
-    result.scrollIntoView({ behavior: "smooth" });
+    result.scrollIntoView({
+        behavior: "smooth"
+    });
 
     try {
 
-        // Ujjain special itinerary
+        // Ujjain special plan
         if (to.toLowerCase().includes("ujjain")) {
 
             result.innerHTML = createUjjainPlan(
-                from, to, days, style
+                from,
+                to,
+                days,
+                style
             );
 
             return;
         }
 
-        // Search destination coordinates
+        // Step 1: Find destination
         const location = await findLocation(to);
 
         const lat = location.latitude;
+
         const lon = location.longitude;
 
-        // Search tourist places
-        // Multiple requests are handled simultaneously.
-        const mapData = await searchOverpass(lat, lon);
+        // Step 2: Find tourist places
+        const mapData = await searchOverpass(
+            lat,
+            lon,
+            to
+        );
 
+        // Step 3: Filter places
         const places = filterPlaces(mapData.elements);
 
         if (places.length === 0) {
 
             result.innerHTML = `
+
                 <h2>${escapeHTML(to)}</h2>
 
                 <p>No mapped tourist places were found nearby.</p>
 
                 ${createMapLink("Tourist places", to)}
+
             `;
 
             return;
         }
 
+        // Step 4: Create itinerary
         let html = `
+
             <h2>${escapeHTML(from)} → ${escapeHTML(to)}</h2>
 
             <p>${days} Days | ${escapeHTML(style)}</p>
@@ -526,20 +694,26 @@ async function makePlan() {
             <h3>Tourist Places near ${escapeHTML(to)}</h3>
 
             <p>
-                Places found within approximately 20 km
+                Places found within approximately 10 km
                 of your destination. Map data may be incomplete.
             </p>
+
         `;
 
-        html += createItinerary(places, days, to);
+        html += createItinerary(
+            places,
+            days,
+            to
+        );
 
         result.innerHTML = html;
 
     } catch (error) {
 
-        console.error("Trip Planner Error:", error);
+        console.error("AI Trip Planner Error:", error);
 
         result.innerHTML = `
+
             <h2>Unable to load tourist places</h2>
 
             <p>${escapeHTML(error.message)}</p>
@@ -547,13 +721,21 @@ async function makePlan() {
             <p>Please try again later.</p>
 
             ${createMapLink("Tourist places", to)}
+
         `;
 
     } finally {
 
+        isSearching = false;
+
+        result.setAttribute("aria-busy", "false");
+
         if (button) {
+
             button.disabled = false;
+
             button.textContent = "Create My Trip →";
+
         }
     }
 }
