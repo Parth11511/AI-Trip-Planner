@@ -513,4 +513,5 @@ document.addEventListener("DOMContentLoaded", () => {
     if (button) {
         button.addEventListener("click", makePlan);
     }
-});
+}};
+window.makePlan = makePlan;
