@@ -4,241 +4,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1f17">
+    <meta name="description" content="Plan your India trip with AI Trip Planner. Discover destinations, tourist places and hotels.">
 
-    <meta name="theme-color" content="#ffffff">
-    <meta name="description" content="AI Trip Planner helps you discover tourist places and plan your India trip with day-wise itineraries.">
+    <title>AI Trip Planner - Explore India</title>
 
-    <title>AI Trip Planner | Explore India</title>
-
-    <!-- Existing stylesheet -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- Preconnect for faster external image loading -->
     <link rel="preconnect" href="https://images.unsplash.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <style>
+        #create-trip-btn {
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        #trip-result {
+            display: none;
+        }
+
+        #trip-result.show {
+            display: block !important;
+        }
+    </style>
 </head>
 
 <body>
 
-<header>
-    <div class="logo">
-        AI <span>TRIP PLANNER</span> 🇮🇳
-    </div>
+    <!-- HEADER -->
+    <header>
+        <div class="logo">
+            AI <span>TRIP PLANNER</span> 🇮🇳
+        </div>
 
-    <nav>
-        <a href="#planner">Plan a Trip</a>
-        <a href="#destinations">Destinations</a>
-        <a href="#about">About</a>
-    </nav>
-</header>
+        <nav>
+            <a href="#planner">Plan a Trip</a>
+            <a href="#destinations">Destinations</a>
+            <a href="#about">About</a>
+        </nav>
+    </header>
 
-<!-- HERO SECTION -->
 
-<section class="hero">
+    <!-- HERO SECTION -->
+    <section class="hero">
 
-    <div class="hero-content">
+        <div class="hero-content">
 
-        <span class="tag">DISCOVER INDIA, YOUR WAY</span>
+            <span class="tag">DISCOVER INDIA, YOUR WAY</span>
 
-        <h1>
-            Every journey.<br>
-            Planned beautifully.
-        </h1>
+            <h1>
+                Every journey.<br>
+                Planned beautifully.
+            </h1>
 
-        <p>
-            Tell us where you're going and how many days
-            you have. Get a clear day-wise sightseeing plan,
-            suggested visit order and useful travel links.
-        </p>
+            <p>
+                Discover amazing destinations, explore tourist places
+                and find hotels with your AI Trip Planner.
+            </p>
 
-        <a href="#planner" class="hero-btn">
-            Plan Your Trip →
-        </a>
+            <a href="#planner" class="hero-btn">
+                Plan Your Trip →
+            </a>
 
-    </div>
+        </div>
 
-</section>
+    </section>
 
-<main class="container">
 
     <!-- TRIP PLANNER -->
+    <section class="planner-section" id="planner">
 
-    <section class="planner" id="planner">
+        <div class="section-heading">
+            <span class="tag">YOUR NEXT ADVENTURE</span>
+            <h2>Plan Your Perfect Trip</h2>
+            <p>Enter your travel details and create your trip plan.</p>
+        </div>
 
-        <h2>Plan your next adventure</h2>
+        <div class="planner">
 
-        <div class="form-grid">
-
-            <div>
-                <label for="from">FROM CITY</label>
-
+            <div class="form-group">
+                <label for="from">Starting Location</label>
                 <input
                     type="text"
                     id="from"
-                    placeholder="Ahmedabad"
+                    placeholder="Enter starting city"
                     value="Ahmedabad"
-                    autocomplete="address-level2"
                 >
             </div>
 
-            <div>
-                <label for="to">DESTINATION</label>
-
+            <div class="form-group">
+                <label for="to">Destination</label>
                 <input
                     type="text"
                     id="to"
-                    placeholder="Manali"
+                    placeholder="Enter destination"
                     value="Manali"
-                    autocomplete="off"
                 >
             </div>
 
-            <div>
-                <label for="days">TRIP DURATION</label>
-
+            <div class="form-group">
+                <label for="days">Number of Days</label>
                 <select id="days">
                     <option value="1">1 Day</option>
                     <option value="2" selected>2 Days</option>
                     <option value="3">3 Days</option>
                     <option value="4">4 Days</option>
                     <option value="5">5 Days</option>
+                    <option value="6">6 Days</option>
                     <option value="7">7 Days</option>
+                    <option value="10">10 Days</option>
+                    <option value="15">15 Days</option>
                 </select>
             </div>
 
-            <div>
-                <label for="style">TRAVEL STYLE</label>
-
+            <div class="form-group">
+                <label for="style">Trip Type</label>
                 <select id="style">
-                    <option>Family trip</option>
-                    <option>Spiritual trip</option>
-                    <option>Adventure</option>
-                    <option>Budget trip</option>
-                    <option>Relaxed trip</option>
+                    <option value="Family trip">Family Trip</option>
+                    <option value="Friends trip">Friends Trip</option>
+                    <option value="Couple trip">Couple Trip</option>
+                    <option value="Solo trip">Solo Trip</option>
+                    <option value="Adventure trip">Adventure Trip</option>
                 </select>
             </div>
 
+            <button
+                type="button"
+                id="create-trip-btn"
+                onclick="if(typeof window.makePlan === 'function'){window.makePlan();}else{alert('Trip planner script load nahi hua. Please script.js check karo.');}"
+            >
+                Create My Trip →
+            </button>
+
         </div>
-
-      
-
-
-<button
-    type="button"
-    style="position:relative; z-index:99999; pointer-events:auto;"
-    onclick="alert('BUTTON WORKING!')"
->
-    Create My Trip →
-</button>
 
     </section>
 
-    <!-- LOADING AND RESULTS -->
 
-    <section
-        id="trip-result"
-        class="trip-result"
-        style="display:none; background:white; padding:25px; margin-top:25px; border-radius:15px;"
-        aria-live="polite"
-        aria-busy="false"
-    ></section>
+    <!-- TRIP RESULTS -->
+    <section id="trip-result" class="trip-result"></section>
 
-    <!-- POPULAR DESTINATIONS -->
 
-    <section class="destinations" id="destinations">
+    <!-- DESTINATIONS -->
+    <section class="destinations-section" id="destinations">
 
-        <span class="tag">GET INSPIRED</span>
+        <div class="section-heading">
+            <span class="tag">EXPLORE INDIA</span>
+            <h2>Popular Destinations</h2>
+            <p>Explore beautiful places across India.</p>
+        </div>
 
-        <h2>Popular Places in India</h2>
+        <div class="destination-grid">
 
-        <div class="cards">
-
-            <div class="card">
-
-                <img
-                    src="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=700"
-                    alt="Ujjain"
-                    loading="lazy"
-                    decoding="async"
-                >
-
-                <div class="card-content">
-                    <small>MADHYA PRADESH</small>
-                    <h3>Ujjain</h3>
-                    <p>Temples and spiritual destinations.</p>
-                </div>
-
+            <div class="destination-card">
+                <img src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80" alt="Ujjain">
+                <h3>Ujjain</h3>
+                <p>Madhya Pradesh</p>
             </div>
 
-            <div class="card">
-
-                <img
-                    src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?w=700"
-                    alt="Jaipur"
-                    loading="lazy"
-                    decoding="async"
-                >
-
-                <div class="card-content">
-                    <small>RAJASTHAN</small>
-                    <h3>Jaipur</h3>
-                    <p>Historic forts and royal architecture.</p>
-                </div>
-
+            <div class="destination-card">
+                <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80" alt="Manali">
+                <h3>Manali</h3>
+                <p>Himachal Pradesh</p>
             </div>
 
-            <div class="card">
+            <div class="destination-card">
+                <img src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80" alt="Jaipur">
+                <h3>Jaipur</h3>
+                <p>Rajasthan</p>
+            </div>
 
-                <img
-                    src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=700"
-                    alt="Mumbai"
-                    loading="lazy"
-                    decoding="async"
-                >
-
-                <div class="card-content">
-                    <small>MAHARASHTRA</small>
-                    <h3>Mumbai</h3>
-                    <p>Famous landmarks and city life.</p>
-                </div>
-
+            <div class="destination-card">
+                <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80" alt="Goa">
+                <h3>Goa</h3>
+                <p>India</p>
             </div>
 
         </div>
 
     </section>
+
 
     <!-- ABOUT -->
+    <section class="about-section" id="about">
 
-    <section class="about" id="about">
+        <div class="section-heading">
+            <span class="tag">ABOUT US</span>
+            <h2>Explore India Easily</h2>
 
-        <span class="tag">OUR IDEA</span>
-
-        <h2>Less searching. More exploring.</h2>
-
-        <p>
-            AI Trip Planner helps travellers organise
-            destinations, plan sightseeing and explore
-            India with a smarter travel itinerary.
-        </p>
+            <p>
+                AI Trip Planner helps you discover destinations,
+                tourist attractions and hotels across India.
+                Plan your next adventure in one place.
+            </p>
+        </div>
 
     </section>
 
-</main>
 
-<!-- FOOTER -->
+    <!-- FOOTER -->
+    <footer>
+        <div class="logo">
+            AI <span>TRIP PLANNER</span> 🇮🇳
+        </div>
 
-<footer>
+        <p>Explore India. Create Memories.</p>
+        <p>© 2026 AI Trip Planner. All Rights Reserved.</p>
+    </footer>
 
-    <h3>AI TRIP PLANNER 🇮🇳</h3>
 
-    <p>Explore India. Plan Smarter. Travel Better.</p>
-
-    <small>© 2026 AI Trip Planner</small>
-
-</footer>
-
-<!-- Load JavaScript without blocking HTML rendering -->
-<script src="script.js?v=4" defer></script>
+    <!-- JAVASCRIPT -->
+    <script src="script.js?v=5" defer></script>
 
 </body>
 </html>
