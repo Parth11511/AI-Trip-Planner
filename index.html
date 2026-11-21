@@ -6,14 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <meta name="theme-color" content="#ffffff">
-    <meta name="description" content="AI Trip Planner helps you discover tourist places and plan your India trip with day-wise itineraries.">
+    <meta name="description" content="AI Trip Planner helps you discover tourist places and plan your India trip.">
 
     <title>AI Trip Planner | Explore India</title>
 
-    <link rel="stylesheet" href="style.css">
-
+    <link rel="stylesheet" href="./style.css?v=7">
     <link rel="preconnect" href="https://images.unsplash.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
 </head>
 
 <body>
@@ -31,7 +29,6 @@
         </nav>
     </header>
 
-
     <!-- HERO SECTION -->
     <section class="hero">
         <div class="hero-content">
@@ -45,7 +42,7 @@
 
             <p>
                 Discover amazing destinations, explore tourist places
-                and plan your next unforgettable journey across India.
+                and find hotels with your AI Trip Planner.
             </p>
 
             <a href="#planner" class="hero-btn">
@@ -55,138 +52,126 @@
         </div>
     </section>
 
+    <main class="container">
 
-    <!-- TRIP PLANNER -->
-    <section class="planner-section" id="planner">
+        <!-- TRIP PLANNER -->
+        <section class="planner" id="planner">
 
-        <div class="section-heading">
             <span class="tag">YOUR NEXT ADVENTURE</span>
+
             <h2>Plan Your Perfect Trip</h2>
-            <p>Enter your travel details and create your trip plan.</p>
-        </div>
 
-        <div class="planner">
+            <div class="form-grid">
 
-            <div class="form-group">
-                <label for="from">Starting Location</label>
-                <input
-                    type="text"
-                    id="from"
-                    placeholder="Enter starting city"
-                    value="Ahmedabad"
-                >
+                <div>
+                    <label for="from">Starting Location</label>
+                    <input
+                        type="text"
+                        id="from"
+                        placeholder="Enter starting city"
+                        value="Ahmedabad"
+                    >
+                </div>
+
+                <div>
+                    <label for="to">Destination</label>
+                    <input
+                        type="text"
+                        id="to"
+                        placeholder="Enter destination"
+                        value="Manali"
+                    >
+                </div>
+
+                <div>
+                    <label for="days">Number of Days</label>
+                    <select id="days">
+                        <option value="1">1 Day</option>
+                        <option value="2" selected>2 Days</option>
+                        <option value="3">3 Days</option>
+                        <option value="4">4 Days</option>
+                        <option value="5">5 Days</option>
+                        <option value="6">6 Days</option>
+                        <option value="7">7 Days</option>
+                        <option value="10">10 Days</option>
+                        <option value="15">15 Days</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="style">Trip Type</label>
+                    <select id="style">
+                        <option value="Family trip">Family Trip</option>
+                        <option value="Friends trip">Friends Trip</option>
+                        <option value="Couple trip">Couple Trip</option>
+                        <option value="Solo trip">Solo Trip</option>
+                        <option value="Adventure trip">Adventure Trip</option>
+                    </select>
+                </div>
+
             </div>
 
-            <div class="form-group">
-                <label for="to">Destination</label>
-                <input
-                    type="text"
-                    id="to"
-                    placeholder="Enter destination"
-                    value="Manali"
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="days">Number of Days</label>
-                <select id="days">
-                    <option value="1">1 Day</option>
-                    <option value="2" selected>2 Days</option>
-                    <option value="3">3 Days</option>
-                    <option value="4">4 Days</option>
-                    <option value="5">5 Days</option>
-                    <option value="6">6 Days</option>
-                    <option value="7">7 Days</option>
-                    <option value="10">10 Days</option>
-                    <option value="15">15 Days</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="style">Trip Type</label>
-                <select id="style">
-                    <option value="Family trip">Family Trip</option>
-                    <option value="Friends trip">Friends Trip</option>
-                    <option value="Couple trip">Couple Trip</option>
-                    <option value="Solo trip">Solo Trip</option>
-                    <option value="Adventure trip">Adventure Trip</option>
-                </select>
-            </div>
-
-            <!-- FIXED BUTTON -->
-            <button
-                type="button"
-                id="create-trip-btn"
-                onclick="makePlan()"
-            >
+            <button type="button" id="create-trip-btn">
                 Create My Trip →
             </button>
 
-        </div>
+        </section>
 
-    </section>
+        <!-- TRIP RESULTS -->
+        <section id="trip-result"></section>
 
+        <!-- POPULAR DESTINATIONS -->
+        <section class="destinations" id="destinations">
 
-    <!-- TRIP RESULTS -->
-    <section id="trip-result" class="trip-result"></section>
-
-
-    <!-- POPULAR DESTINATIONS -->
-    <section class="destinations-section" id="destinations">
-
-        <div class="section-heading">
             <span class="tag">EXPLORE INDIA</span>
+
             <h2>Popular Destinations</h2>
-            <p>Discover beautiful places across India.</p>
-        </div>
 
-        <div class="destination-grid">
+            <div class="cards">
 
-            <div class="destination-card">
-                <img
-                    src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80"
-                    alt="Ujjain"
-                >
-                <h3>Ujjain</h3>
-                <p>Madhya Pradesh</p>
+                <div class="card">
+                    <img
+                        src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80"
+                        alt="Ujjain"
+                    >
+                    <div class="card-content">
+                        <small>MADHYA PRADESH</small>
+                        <h3>Ujjain</h3>
+                        <p>Explore Mahakaleshwar Temple and the beautiful Ram Ghat.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <img
+                        src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80"
+                        alt="Manali"
+                    >
+                    <div class="card-content">
+                        <small>HIMACHAL PRADESH</small>
+                        <h3>Manali</h3>
+                        <p>Discover mountains, beautiful valleys and scenic views.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <img
+                        src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80"
+                        alt="Jaipur"
+                    >
+                    <div class="card-content">
+                        <small>RAJASTHAN</small>
+                        <h3>Jaipur</h3>
+                        <p>Explore royal palaces, forts and the Pink City.</p>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="destination-card">
-                <img
-                    src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80"
-                    alt="Manali"
-                >
-                <h3>Manali</h3>
-                <p>Himachal Pradesh</p>
-            </div>
+        </section>
 
-            <div class="destination-card">
-                <img
-                    src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80"
-                    alt="Jaipur"
-                >
-                <h3>Jaipur</h3>
-                <p>Rajasthan</p>
-            </div>
+        <!-- ABOUT -->
+        <section class="about" id="about">
 
-            <div class="destination-card">
-                <img
-                    src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80"
-                    alt="Mumbai"
-                >
-                <h3>Mumbai</h3>
-                <p>Maharashtra</p>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ABOUT -->
-    <section class="about-section" id="about">
-
-        <div class="section-heading">
             <span class="tag">ABOUT US</span>
 
             <h2>Explore India Easily</h2>
@@ -196,27 +181,20 @@
                 tourist attractions and hotels across India.
                 Plan your next adventure in one place.
             </p>
-        </div>
 
-    </section>
+        </section>
 
+    </main>
 
     <!-- FOOTER -->
     <footer>
-
-        <div class="logo">
-            AI <span>TRIP PLANNER</span> 🇮🇳
-        </div>
-
+        <h3>AI TRIP PLANNER 🇮🇳</h3>
         <p>Explore India. Create Memories.</p>
-
         <p>© 2026 AI Trip Planner. All Rights Reserved.</p>
-
     </footer>
 
-
     <!-- JAVASCRIPT -->
-    <script src="./script.js?v=6" defer></script>
+    <script src="./script.js?v=7" defer></script>
 
 </body>
 </html>
