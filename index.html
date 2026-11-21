@@ -4,32 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0b1f17">
-    <meta name="description" content="Plan your India trip with AI Trip Planner. Discover destinations, tourist places and hotels.">
 
-    <title>AI Trip Planner - Explore India</title>
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="AI Trip Planner helps you discover tourist places and plan your India trip with day-wise itineraries.">
+
+    <title>AI Trip Planner | Explore India</title>
 
     <link rel="stylesheet" href="style.css">
 
     <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <style>
-        #create-trip-btn {
-            position: relative;
-            z-index: 10;
-            pointer-events: auto;
-            cursor: pointer;
-        }
-
-        #trip-result {
-            display: none;
-        }
-
-        #trip-result.show {
-            display: block !important;
-        }
-    </style>
 </head>
 
 <body>
@@ -50,7 +34,6 @@
 
     <!-- HERO SECTION -->
     <section class="hero">
-
         <div class="hero-content">
 
             <span class="tag">DISCOVER INDIA, YOUR WAY</span>
@@ -62,7 +45,7 @@
 
             <p>
                 Discover amazing destinations, explore tourist places
-                and find hotels with your AI Trip Planner.
+                and plan your next unforgettable journey across India.
             </p>
 
             <a href="#planner" class="hero-btn">
@@ -70,7 +53,6 @@
             </a>
 
         </div>
-
     </section>
 
 
@@ -131,10 +113,11 @@
                 </select>
             </div>
 
+            <!-- FIXED BUTTON -->
             <button
                 type="button"
                 id="create-trip-btn"
-                onclick="if(typeof window.makePlan === 'function'){window.makePlan();}else{alert('Trip planner script load nahi hua. Please script.js check karo.');}"
+                onclick="makePlan()"
             >
                 Create My Trip →
             </button>
@@ -148,39 +131,51 @@
     <section id="trip-result" class="trip-result"></section>
 
 
-    <!-- DESTINATIONS -->
+    <!-- POPULAR DESTINATIONS -->
     <section class="destinations-section" id="destinations">
 
         <div class="section-heading">
             <span class="tag">EXPLORE INDIA</span>
             <h2>Popular Destinations</h2>
-            <p>Explore beautiful places across India.</p>
+            <p>Discover beautiful places across India.</p>
         </div>
 
         <div class="destination-grid">
 
             <div class="destination-card">
-                <img src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80" alt="Ujjain">
+                <img
+                    src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80"
+                    alt="Ujjain"
+                >
                 <h3>Ujjain</h3>
                 <p>Madhya Pradesh</p>
             </div>
 
             <div class="destination-card">
-                <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80" alt="Manali">
+                <img
+                    src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80"
+                    alt="Manali"
+                >
                 <h3>Manali</h3>
                 <p>Himachal Pradesh</p>
             </div>
 
             <div class="destination-card">
-                <img src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80" alt="Jaipur">
+                <img
+                    src="https://images.unsplash.com/photo-1599661046827-dacff0c0f09a?auto=format&fit=crop&w=800&q=80"
+                    alt="Jaipur"
+                >
                 <h3>Jaipur</h3>
                 <p>Rajasthan</p>
             </div>
 
             <div class="destination-card">
-                <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80" alt="Goa">
-                <h3>Goa</h3>
-                <p>India</p>
+                <img
+                    src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80"
+                    alt="Mumbai"
+                >
+                <h3>Mumbai</h3>
+                <p>Maharashtra</p>
             </div>
 
         </div>
@@ -193,10 +188,11 @@
 
         <div class="section-heading">
             <span class="tag">ABOUT US</span>
+
             <h2>Explore India Easily</h2>
 
             <p>
-                AI Trip Planner helps you discover destinations,
+                AI Trip Planner helps travellers discover destinations,
                 tourist attractions and hotels across India.
                 Plan your next adventure in one place.
             </p>
@@ -207,17 +203,20 @@
 
     <!-- FOOTER -->
     <footer>
+
         <div class="logo">
             AI <span>TRIP PLANNER</span> 🇮🇳
         </div>
 
         <p>Explore India. Create Memories.</p>
+
         <p>© 2026 AI Trip Planner. All Rights Reserved.</p>
+
     </footer>
 
 
     <!-- JAVASCRIPT -->
-<script src="./script.js?v=6" defer></script>
+    <script src="./script.js?v=6" defer></script>
 
 </body>
 </html>
