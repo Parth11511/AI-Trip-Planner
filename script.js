@@ -2,6 +2,12 @@
 // =========================================
 // AI TRIP PLANNER - SCRIPT.JS
 // 27 DESTINATIONS + 27 HOTEL CARDS
+// BUTTON FIXED
+// =========================================
+
+
+// =========================================
+// DESTINATION DATA
 // =========================================
 
 const destinations = {
@@ -115,8 +121,9 @@ const destinations = {
     }
 };
 
+
 // =========================================
-// HOTEL DATA - ONE HOTEL PER DESTINATION
+// HOTEL DATA - 27 DESTINATIONS
 // =========================================
 
 const hotelData = {
@@ -257,6 +264,7 @@ const hotelData = {
     }
 };
 
+
 // =========================================
 // DESTINATION ALIASES
 // =========================================
@@ -266,9 +274,9 @@ const aliases = {
     "taj mahal": "agra",
     "coorg": "madikeri",
     "madikeri (coorg)": "madikeri",
-    "mcleodganj": "mcleod ganj",
-    "rann of kutch": "rann of kutch"
+    "mcleodganj": "mcleod ganj"
 };
+
 
 // =========================================
 // HTML ESCAPE
@@ -284,8 +292,9 @@ function escapeHTML(value) {
     })[char]);
 }
 
+
 // =========================================
-// GOOGLE MAPS PLACE LINK
+// GOOGLE MAPS LINK
 // =========================================
 
 function googleMapsLink(query) {
@@ -293,8 +302,9 @@ function googleMapsLink(query) {
         encodeURIComponent(query);
 }
 
+
 // =========================================
-// HOTEL SECTION - WEBSITE KE ANDAR
+// HOTEL SECTION
 // =========================================
 
 function createHotelSection(destinationKey) {
@@ -310,16 +320,20 @@ function createHotelSection(destinationKey) {
     }
 
     const city = destinations[destinationKey].city;
+
     const hotelSearchLink = googleMapsLink(
         hotel.name + " " + city + " India"
     );
 
     return `
         <section class="hotel-section">
+
             <h2>🏨 Recommended Stay in ${escapeHTML(city)}</h2>
 
             <div class="hotel-card">
+
                 <div class="hotel-card-content">
+
                     <span class="hotel-label">HOTEL OPTION</span>
 
                     <h3>${escapeHTML(hotel.name)}</h3>
@@ -328,9 +342,7 @@ function createHotelSection(destinationKey) {
                         ${escapeHTML(hotel.type)}
                     </p>
 
-                    <p>
-                        ${escapeHTML(hotel.description)}
-                    </p>
+                    <p>${escapeHTML(hotel.description)}</p>
 
                     <p>
                         <strong>Destination:</strong>
@@ -344,63 +356,79 @@ function createHotelSection(destinationKey) {
                     >
                         Check hotel location and details →
                     </a>
+
                 </div>
+
             </div>
 
             <p class="hotel-note">
                 Confirm current prices, availability, address
                 and facilities directly before booking.
             </p>
+
         </section>
     `;
 }
+
 
 // =========================================
 // TOURIST PLACES SECTION
 // =========================================
 
 function createPlacesSection(destination) {
+
     let html = `
         <section class="places-section">
+
             <h2>📍 Tourist Places near ${escapeHTML(destination.city)}</h2>
+
             <div class="places-list">
     `;
 
     destination.places.forEach((place, index) => {
+
         const link = googleMapsLink(
             place + " " + destination.city
         );
 
         html += `
             <div class="trip-place">
+
                 <h3>${index + 1}. ${escapeHTML(place)}</h3>
 
-                <a href="${link}"
-                   target="_blank"
-                   rel="noopener noreferrer">
+                <a
+                    href="${link}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
                     Open in Google Maps →
                 </a>
+
             </div>
         `;
     });
 
     html += `
             </div>
+
         </section>
     `;
 
     return html;
 }
 
+
 // =========================================
 // CREATE TRIP PLAN
 // =========================================
 
 function createSavedPlan(from, destinationKey, days, style) {
+
     const destination = destinations[destinationKey];
 
     return `
         <div class="trip-plan">
+
             <h2>
                 ✈️ ${escapeHTML(from)}
                 → ${escapeHTML(destination.city)}
@@ -414,15 +442,18 @@ function createSavedPlan(from, destinationKey, days, style) {
             ${createPlacesSection(destination)}
 
             ${createHotelSection(destinationKey)}
+
         </div>
     `;
 }
+
 
 // =========================================
 // MAIN SEARCH FUNCTION
 // =========================================
 
 function makePlan() {
+
     const fromInput = document.getElementById("from");
     const toInput = document.getElementById("to");
     const daysInput = document.getElementById("days");
@@ -450,68 +481,102 @@ function makePlan() {
     }
 
     const normalized = to.toLowerCase().trim();
+
     const destinationKey = aliases[normalized] || normalized;
 
+    // Clear previous result
     result.innerHTML = "";
 
+    // Known destination
     if (destinations[destinationKey]) {
+
         result.innerHTML = createSavedPlan(
             from,
             destinationKey,
             days,
             style
         );
-        return;
+
+    } else {
+
+        // Unknown destination fallback
+        const placesLink = googleMapsLink(
+            "Tourist places in " + to
+        );
+
+        const hotelsLink = googleMapsLink(
+            "Hotels in " + to + ", India"
+        );
+
+        result.innerHTML = `
+            <div class="trip-plan">
+
+                <h2>
+                    ✈️ ${escapeHTML(from)}
+                    → ${escapeHTML(to)}
+                </h2>
+
+                <p>
+                    ${escapeHTML(days)} Days |
+                    ${escapeHTML(style)} trip
+                </p>
+
+                <section class="places-section">
+
+                    <h2>📍 Tourist Places</h2>
+
+                    <a
+                        href="${placesLink}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Find Tourist Places →
+                    </a>
+
+                </section>
+
+                <section class="hotel-section">
+
+                    <h2>🏨 Hotels in ${escapeHTML(to)}</h2>
+
+                    <a
+                        href="${hotelsLink}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Find Hotels →
+                    </a>
+
+                </section>
+
+            </div>
+        `;
     }
 
-    const placesLink = googleMapsLink(
-        "Tourist places in " + to
-    );
+    // Show result section
+    result.classList.add("show");
+    result.style.display = "block";
 
-    const hotelsLink = googleMapsLink(
-        "Hotels in " + to + ", India"
-    );
-
-    result.innerHTML = `
-        <div class="trip-plan">
-            <h2>
-                ✈️ ${escapeHTML(from)}
-                → ${escapeHTML(to)}
-            </h2>
-
-            <p>
-                ${escapeHTML(days)} Days |
-                ${escapeHTML(style)} trip
-            </p>
-
-            <h2>📍 Tourist Places</h2>
-
-            <a href="${placesLink}" target="_blank"
-               rel="noopener noreferrer">
-                Find Tourist Places →
-            </a>
-
-            <section class="hotel-section">
-                <h2>🏨 Hotels in ${escapeHTML(to)}</h2>
-
-                <a href="${hotelsLink}" target="_blank"
-                   rel="noopener noreferrer">
-                    Find Hotels →
-                </a>
-            </section>
-        </div>
-    `;
+    // Scroll to result
+    result.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 }
 
+
 // =========================================
-// BUTTON EVENT
+// BUTTON EVENT + GLOBAL FUNCTION
 // =========================================
 
+window.makePlan = makePlan;
+
 document.addEventListener("DOMContentLoaded", () => {
+
     const button = document.getElementById("create-trip-btn");
 
     if (button) {
         button.addEventListener("click", makePlan);
     }
-}};
-window.makePlan = makePlan;
+
+});
